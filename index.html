@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>未経験から学ぶ！AI×動画編集でつくる漫画広告動画入門コース</title>
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Zen Maru Gothic (ポップ) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Zen Maru Gothic"', 'sans-serif'],
+                    },
+                    colors: {
+                        comic: {
+                            main: '#05b07b', /* メインの緑 */
+                            light: '#e6f7f2', /* 薄い緑（背景用） */
+                            yellow: '#FFDE00', /* アクセントの黄色 */
+                            pink: '#FF2A6D', /* コンバージョンボタンなどの差し色 */
+                            dark: '#333333', /* 文字色・枠線用の濃いグレー（少し柔らかく） */
+                            gray: '#F3F4F6'
+                        }
+                    },
+                    boxShadow: {
+                        'hard': '4px 4px 0px 0px #333333',
+                        'hard-lg': '8px 8px 0px 0px #333333',
+                        'hard-sm': '2px 2px 0px 0px #333333',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* ==========================================
+           ベース設定 & スクロール
+        ========================================== */
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body { 
+            background-color: #ffffff;
+            color: #333333;
+            overflow-x: hidden;
+            background-image: radial-gradient(#e5e7eb 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+
+        /* ==========================================
+           テクスチャ・背景
+        ========================================== */
+        .bg-halftone-white {
+            background-color: #ffffff;
+            background-image: radial-gradient(circle, #e5e7eb 2px, transparent 2.5px);
+            background-size: 16px 16px;
+        }
+        .bg-halftone-main {
+            background-color: #05b07b;
+            background-image: radial-gradient(circle, #049466 2px, transparent 2.5px);
+            background-size: 16px 16px;
+        }
+        
+        /* 集中線背景（黄色を無くし、ごく薄い緑グレーに変更して清潔感を確保） */
+        .focus-lines-wrapper {
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='transparent'/%3E%3Cstop offset='100%25' stop-color='%2305b07b' stop-opacity='0.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3Cg stroke='%2305b07b' stroke-width='2' opacity='0.08'%3E%3Cpath d='M50%25,50%25 L0,0 M50%25,50%25 L10%25,0 M50%25,50%25 L20%25,0 M50%25,50%25 L30%25,0 M50%25,50%25 L40%25,0 M50%25,50%25 L50%25,0 M50%25,50%25 L60%25,0 M50%25,50%25 L70%25,0 M50%25,50%25 L80%25,0 M50%25,50%25 L90%25,0 M50%25,50%25 L100%25,0 M50%25,50%25 L100%25,10%25 M50%25,50%25 L100%25,20%25 M50%25,50%25 L100%25,30%25 M50%25,50%25 L100%25,40%25 M50%25,50%25 L100%25,50%25 M50%25,50%25 L100%25,60%25 M50%25,50%25 L100%25,70%25 M50%25,50%25 L100%25,80%25 M50%25,50%25 L100%25,90%25 M50%25,50%25 L100%25,100%25 M50%25,50%25 L90%25,100%25 M50%25,50%25 L80%25,100%25 M50%25,50%25 L70%25,100%25 M50%25,50%25 L60%25,100%25 M50%25,50%25 L50%25,100%25 M50%25,50%25 L40%25,100%25 M50%25,50%25 L30%25,100%25 M50%25,50%25 L20%25,100%25 M50%25,50%25 L10%25,100%25 M50%25,50%25 L0,100%25 M50%25,50%25 L0,90%25 M50%25,50%25 L0,80%25 M50%25,50%25 L0,70%25 M50%25,50%25 L0,60%25 M50%25,50%25 L0,50%25 M50%25,50%25 L0,40%25 M50%25,50%25 L0,30%25 M50%25,50%25 L0,20%25 M50%25,50%25 L0,10%25'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ==========================================
+           アニメーション定義
+        ========================================== */
+        /* スクロール連動アニメーションクラス */
+        .js-anim { opacity: 0; transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .js-anim.fade-up { transform: translateY(30px); }
+        .js-anim.pop-in { transform: scale(0.97); }
+        
+        .js-anim.is-visible {
+            opacity: 1;
+            transform: translate(0) scale(1);
+        }
+
+        /* ==========================================
+           UIパーツ (ボタン・吹き出し)
+        ========================================== */
+        /* CTAボタン（上品で押しやすい形へ） */
+        .btn-comic {
+            display: inline-block;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid #333333;
+            position: relative;
+            box-shadow: 4px 4px 0px 0px #333333;
+        }
+        .btn-comic:active {
+            transform: translate(4px, 4px) !important;
+            box-shadow: 0px 0px 0px 0px transparent !important;
+        }
+        .btn-comic:hover {
+            transform: translateY(-4px);
+            box-shadow: 6px 8px 0px 0px #333333;
+        }
+
+        /* テキストハイライト（マーカー風） */
+        .marker-yellow {
+            background: linear-gradient(transparent 60%, #FFDE00 60%);
+        }
+        .marker-main {
+            background: linear-gradient(transparent 60%, #e6f7f2 60%);
+        }
+
+        /* FAQアコーディオン */
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .faq-item.open .faq-answer { border-top: 2px dashed #e5e7eb; }
+        .faq-item.open .faq-icon { transform: rotate(180deg); }
+
+        /* リスト比較用（チェックアイコンとバツアイコンのスタイル） */
+        .list-icon-check { color: #05b07b; width: 24px; text-align: center; font-size: 1.125rem; }
+        .list-icon-minus { color: #9ca3af; width: 24px; text-align: center; font-size: 1.125rem; }
+    </style>
+</head>
+<body class="font-sans antialiased text-comic-dark leading-relaxed">
+
+    <!-- 共通ヘッダー（ロゴ・スクール名表示エリア） -->
+    <header class="bg-white border-b border-gray-200 py-3 md:py-4 relative z-50">
+        <div class="w-full px-4 md:px-8 lg:px-12 flex items-center">
+            <!-- ロゴ枠＋スクール名を1つのまとまりとして左寄せ -->
+            <div class="flex items-center">
+    <div class="w-10 h-10 md:w-12 md:h-12 mr-3 overflow-hidden flex-shrink-0">
+      <img src="logo.png" alt="ロゴ" class="w-full h-full object-contain">
+    </div>
+    <span class="font-bold text-comic-dark text-sm md:text-base tracking-wide leading-none mt-px">リバティー・パレット</span>
+</div>
+        </div>
+    </header>
+
+    <!-- 1. ファーストビュー -->
+    <section class="relative pt-16 pb-20 md:pt-24 md:pb-28 bg-comic-light overflow-hidden border-b-2 border-comic-dark">
+        
+        <!-- ▼ 透かし背景画像レイヤー（後で実際の画像URLに差し替えてください） -->
+        <div class="absolute inset-0 z-0 pointer-events-none opacity-10 bg-center bg-cover bg-no-repeat" style="background-image: url('watermark.png');"></div>
+
+        <!-- 上品な高揚感を演出する背景装飾 -->
+        <div class="focus-lines-wrapper"></div>
+        
+        <div class="container mx-auto px-4 relative z-10 max-w-4xl text-center">
+            
+            <!-- メインコピー -->
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-black text-comic-dark leading-snug md:leading-snug mb-8 md:mb-10 js-anim pop-in">
+                未経験から学ぶ！<br>
+                <!-- 自然な帯ハイライト -->
+                <span class="inline-block border-b-4 border-comic-yellow text-comic-main px-2 mt-2 mb-2">AI×動画編集</span>でつくる<br>
+                漫画広告動画入門コース
+            </h1>
+            
+            <!-- サブコピー (影と濃い枠をなくし、ボタンとの差別化を図る) -->
+            <div class="bg-white/95 backdrop-blur-sm border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm max-w-3xl mx-auto mb-10 md:mb-12 relative js-anim fade-up" style="transition-delay: 0.1s;">
+                <p class="text-base md:text-xl font-bold leading-loose">
+                    AIを活用しながら、漫画広告動画を企画から編集まで<br class="hidden md:block">
+                    <strong class="marker-yellow text-xl md:text-2xl px-1">一人で形にできる力</strong>を身につける！<br>
+                    実際の納品案件を題材に、実務の流れを実践的に学びます。
+                </p>
+            </div>
+            
+            <!-- CTAボタン -->
+            <div class="flex flex-col sm:flex-row justify-center items-stretch gap-4 md:gap-6 js-anim fade-up" style="transition-delay: 0.2s;">
+                <!-- リンク設定：料金プランのセクションへアンカーリンク -->
+                <a href="https://liberty-palette.lectea.jp/school/course/paid.php?course_id=2535" class="w-full sm:w-auto bg-white text-comic-dark font-bold py-3 px-6 md:px-8 rounded-2xl text-center btn-comic flex flex-col justify-center group hover:bg-comic-light hover:!border-comic-main transition-all">
+                    <span class="text-xs text-gray-500 font-bold mb-1 group-hover:text-comic-main transition-colors">自分のペースでじっくり学びたい方へ</span>
+                    <span class="text-base md:text-lg font-black group-hover:text-comic-main transition-colors">買い切り・永久視聴プランで申し込む</span>
+                </a>
+                
+                <!-- リンク設定：料金プランのセクションへアンカーリンク -->
+                <a href="https://liberty-palette.lectea.jp/school/course/paid.php?course_id=3736" class="w-full sm:w-auto bg-white text-comic-dark font-bold py-3 px-6 md:px-8 rounded-2xl text-center btn-comic flex flex-col justify-center group hover:bg-comic-light hover:!border-comic-main transition-all">
+                    <span class="text-xs text-gray-500 font-bold mb-1 group-hover:text-comic-main transition-colors">必要な期間だけ学びたい方へ</span>
+                    <span class="text-base md:text-lg font-black group-hover:text-comic-main transition-colors">月額受講プランで申し込む</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. このような動画が作れるようになります -->
+    <section class="py-20 bg-white relative z-10">
+        <div class="container mx-auto px-4 max-w-4xl text-center">
+            
+            <!-- 装飾付き見出し -->
+            <div class="mb-12 js-anim pop-in relative inline-block">
+                <h2 class="text-2xl md:text-4xl font-black relative inline-block">
+                    このような動画が作れるようになります
+                    <span class="block w-full h-2 bg-comic-yellow mt-2 rounded-sm opacity-80"></span>
+                </h2>
+            </div>
+            
+            <!-- 見本動画エリア (Vimeo埋め込み) -->
+            <div class="relative bg-white border-2 border-comic-dark rounded-xl p-3 shadow-hard max-w-3xl mx-auto mb-10 js-anim fade-up">
+                <div class="bg-gray-100 rounded-lg border border-gray-200 overflow-hidden relative shadow-sm">
+                    <!-- Vimeo埋め込みコード -->
+                    <div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1179287050?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="漫画広告動画制作コースの教材動画"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+                </div>
+            </div>
+            
+            <p class="text-lg md:text-xl font-bold text-comic-dark js-anim fade-up leading-relaxed">
+                実際の納品案件を題材に学びながら、<br class="md:hidden">
+                <strong class="marker-yellow px-1">自分でも作れるようになること</strong>を目指します。
+            </p>
+        </div>
+    </section>
+
+    <!-- 3. こんなお悩みありませんか? -->
+    <section class="py-20 bg-comic-light text-comic-dark relative border-y-2 border-gray-200">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <!-- 装飾付きタイトル -->
+            <div class="text-center mb-12 js-anim pop-in">
+                <h2 class="text-2xl md:text-4xl font-black inline-block bg-white px-8 py-3 border-2 border-comic-dark rounded-xl shadow-hard-sm">
+                    <i class="fa-solid fa-cloud-showers-heavy text-gray-400 mr-2"></i> こんなお悩みありませんか？
+                </h2>
+            </div>
+            
+            <!-- お悩みリスト -->
+            <div class="bg-white border-2 border-comic-dark rounded-xl p-6 md:p-10 shadow-hard js-anim fade-up relative">
+
+                <div class="w-fit mx-auto">
+                    <ul class="space-y-6 md:space-y-8 font-bold text-[17px] md:text-xl">
+                        <li class="flex items-start group">
+                            <i class="fa-solid fa-check text-comic-main text-xl md:text-2xl mt-1 mr-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+                            <p>動画編集に興味はあるけれど、<span class="text-gray-500 bg-gray-50 px-1 rounded">分からないことが多くて始められない...</span></p>
+                        </li>
+                        <li class="flex items-start group">
+                            <i class="fa-solid fa-check text-comic-main text-xl md:text-2xl mt-1 mr-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+                            <p>漫画広告動画を作ってみたいけれど、<span class="text-gray-500 bg-gray-50 px-1 rounded">難しそうで自分にできる気がしない...</span></p>
+                        </li>
+                        <li class="flex items-start group">
+                            <i class="fa-solid fa-check text-comic-main text-xl md:text-2xl mt-1 mr-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+                            <p>独学だと体系立てて学びにくく、<span class="text-gray-500 bg-gray-50 px-1 rounded">最後まで作品を1本作り切るのが難しい...</span></p>
+                        </li>
+                        <li class="flex items-start group">
+                            <i class="fa-solid fa-check text-comic-main text-xl md:text-2xl mt-1 mr-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+                            <p>集団形式のスクールだと、<span class="text-gray-500 bg-gray-50 px-1 rounded">受講日程を自由に決められない...</span></p>
+                        </li>
+                        <li class="flex items-start group">
+                            <i class="fa-solid fa-check text-comic-main text-xl md:text-2xl mt-1 mr-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+                            <p>人前だと質問しづらく、<span class="text-gray-500 bg-gray-50 px-1 rounded">直接指導を受けられる機会も限られがち...</span></p>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t-2 border-dashed border-gray-200 text-center relative">
+                    <i class="fa-solid fa-arrow-down text-gray-300 text-2xl absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white px-2"></i>
+                    <p class="text-lg md:text-2xl font-black text-comic-main mt-4">
+                        将来的に、仕事につながる<br class="md:hidden"><span class="marker-yellow">実践的なスキル</span>を身につけたい！
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. このコースなら大丈夫 -->
+    <section class="py-24 relative overflow-hidden bg-white">
+        <div class="container mx-auto px-4 max-w-5xl relative z-10">
+            <div class="js-anim pop-in mb-10 text-center">
+                <h2 class="text-2xl md:text-4xl font-black inline-block text-comic-main mb-2 relative">
+                    このコースなら大丈夫です。
+                </h2>
+                <p class="text-gray-500 font-bold mt-2">動画編集の「実践力」を身につけるための講座</p>
+            </div>
+            
+           <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6 max-w-6xl mx-auto js-anim fade-up">
+                <!-- テキスト部分 (囲みボックス) -->
+               <div class="w-full md:w-[58%] relative bg-white border-[3px] border-comic-dark rounded-2xl p-8 md:p-12 shadow-hard-sm text-left md:text-center text-base md:text-xl font-bold leading-loose space-y-6">
+                    <p>
+                        動画編集は、ソフトの使い方を覚えただけで、<br class="hidden md:block">
+                        うまくできるようになるものではありません。<br>
+                        動画はジャンルによって、使うテクニックも考えることも変わるからです。
+                    </p>
+                    
+                    <div class="bg-comic-light p-6 border-2 border-comic-main rounded-lg relative overflow-hidden">
+                        <p class="text-lg md:text-2xl font-black text-comic-dark relative z-10">
+                            だからこそ大事なのは、<br>
+                            操作を覚えることではなく、<br>
+                            <!-- box-decoration-cloneを追加して、折り返し時に各行にマーカーが綺麗に引かれるように修正 -->
+                            <span class="block mt-2"></span>
+                            <strong class="marker-yellow box-decoration-clone px-1">「ひとつの動画を自分の手で形にできる」</strong>こと。
+                        </p>
+                    </div>
+                    
+                    <p>
+                        このコースでは、その第一歩として、AIも活用しながら、<br>
+                        <strong class="text-comic-main bg-comic-light px-2 py-1 rounded">漫画広告動画を一人で作れる力</strong>を身につけていきます。
+                    </p>
+                    <p>
+                        決まった日程に合わせる必要はなく、<strong class="text-comic-main">ご自分のペースで</strong>学習を進められます。<br class="hidden md:block">
+                        分からないことはいつでも個別に質問できるため、挫折せずに進めやすい環境です。
+                    </p>
+                </div>
+                
+                <!-- 補助ビジュアル画像部分（後で透過イラストが入る予定の枠） -->
+                <div class="w-full md:w-[42%] mt-8 md:mt-0 relative z-0 flex justify-center items-end">
+  <img src="guide.png" alt="案内キャラクター" class="w-full max-w-[720px] h-auto object-contain drop-shadow-md scale-125 origin-center">
+</div>
+                    <!-- 実際に入れる際は上記divを消して下のimgタグのsrcを設定してください -->
+                    <!-- <img src="guide.png" alt="案内キャラクター" class="w-full max-w-[280px] h-auto object-contain drop-shadow-md"> -->
+               
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. なぜ今、漫画広告動画を学ぶべきなのか -->
+    <section class="py-20 bg-comic-main border-y-2 border-comic-dark bg-halftone-main relative overflow-hidden">
+        <div class="container mx-auto px-4 max-w-5xl relative z-10">
+            
+            <div class="text-center mb-16 js-anim pop-in">
+                <h2 class="text-2xl md:text-4xl font-black text-comic-dark bg-white inline-block px-8 py-3 rounded-full shadow-hard-sm">
+                    <i class="fa-solid fa-magnifying-glass text-comic-yellow mr-2"></i>なぜ今、漫画広告動画なのか？
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                <!-- 理由1 -->
+                <div class="bg-white border-2 border-comic-dark p-6 md:p-8 rounded-xl shadow-hard js-anim slide-up hover:-translate-y-1 transition-transform">
+                    <div class="text-center mb-4 text-4xl text-comic-main"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    <h3 class="font-black text-xl mb-3 text-center border-b-2 border-gray-100 pb-2">高まる需要</h3>
+                    <p class="font-bold text-sm md:text-base leading-relaxed text-gray-700">
+                        動画広告市場が成長しており、漫画形式への需要も高まっています。
+                    </p>
+                </div>
+                <!-- 理由2 -->
+                <div class="bg-white border-2 border-comic-dark p-6 md:p-8 rounded-xl shadow-hard js-anim slide-up hover:-translate-y-1 transition-transform" style="transition-delay: 0.1s;">
+                    <div class="text-center mb-4 text-4xl text-comic-yellow"><i class="fa-solid fa-coins"></i></div>
+                    <h3 class="font-black text-xl mb-3 text-center border-b-2 border-gray-100 pb-2">比較的高い単価</h3>
+                    <p class="font-bold text-sm md:text-base leading-relaxed text-gray-700">
+                        新米動画クリエイターが取り組みやすい案件の中では、比較的単価が高い傾向にあります。
+                    </p>
+                </div>
+                <!-- 理由3 -->
+                <div class="bg-white border-2 border-comic-dark p-6 md:p-8 rounded-xl shadow-hard js-anim slide-up hover:-translate-y-1 transition-transform" style="transition-delay: 0.2s;">
+                    <div class="text-center mb-4 text-4xl text-comic-dark"><i class="fa-solid fa-robot"></i></div>
+                    <h3 class="font-black text-xl mb-3 text-center border-b-2 border-gray-100 pb-2">一人で作れる環境</h3>
+                    <p class="font-bold text-sm md:text-base leading-relaxed text-gray-700">
+                        AIツールの進化により、一人でもワンストップで制作しやすい環境が整いました。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. 手厚いサポートで、最後まで進めやすい -->
+    <section class="py-20 bg-white relative">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <h2 class="text-2xl md:text-4xl font-black mb-12 text-center js-anim pop-in">
+                <span class="marker-yellow px-2">手厚いサポート</span>で、最後まで進めやすい
+            </h2>
+
+            <div class="bg-comic-light border-2 border-comic-dark rounded-xl p-6 md:p-10 shadow-hard-sm js-anim fade-up relative">
+                <p class="font-bold mb-6 text-base md:text-lg leading-loose">
+                    このコースでは、<strong class="text-comic-main font-black text-xl">質問し放題</strong>に加えて、<br>
+                    案件応募から納品までの流れを、ロールプレイ形式で体験できる<strong class="bg-white px-2 py-1 border border-gray-200 rounded mx-1 shadow-sm text-comic-main">実践チャレンジ</strong>も用意しています。
+                </p>
+                <p class="font-bold text-gray-700 mb-8 text-sm md:text-base">
+                    チャレンジ後は添削も受けられるため、取り組んで終わりではなく、改善点まで確認しながら次につなげていけます。
+                </p>
+                
+                <!-- 実案件のチャンス -->
+                <div class="bg-white p-5 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <p class="font-black text-lg mb-2 text-comic-main flex items-center">
+                        <span class="bg-comic-light text-comic-main w-8 h-8 rounded-full flex items-center justify-center mr-2"><i class="fa-solid fa-handshake"></i></span>
+                        優秀な方には実案件の相談も！
+                    </p>
+                    <p class="font-bold text-sm text-gray-700 mb-2 pl-10">
+                        実践チャレンジの内容や完成度を見て、特に優秀だと感じた方には、将来的に実案件の一部をお願いする可能性があります。
+                    </p>
+                    <p class="text-xs text-gray-400 pl-10">
+                        ※ただし、これは全員にお約束するものではなく、あくまで取り組み内容や完成度を見たうえでの判断となります。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. 2つの受講プラン -->
+    <section id="pricing" class="py-24 bg-gray-50 border-y-2 border-gray-200 relative">
+        <div class="container mx-auto px-4 max-w-5xl">
+            <div class="text-center mb-16 js-anim pop-in">
+                <h2 class="text-2xl md:text-4xl font-black text-comic-dark mb-4">
+                    2つの受講プランをご用意しています
+                </h2>
+                <p class="text-gray-600 font-bold">
+                    ご希望に合わせて選べます（コース内容は同じです）
+                </p>
+            </div>
+
+            <!-- プランカードエリア -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                
+                <!-- 買い切りプラン -->
+                <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm flex flex-col relative js-anim fade-up transition-all duration-300 md:hover:border-comic-main md:hover:shadow-md group">
+                    <div class="bg-gray-100 border-b border-gray-200 text-gray-700 text-center py-3 rounded-t-xl group-hover:bg-comic-light group-hover:text-comic-main transition-colors duration-300">
+                        <p class="font-bold text-sm">自分のペースでじっくり学びたい方へ</p>
+                    </div>
+                    
+                    <div class="p-6 md:p-8 flex-grow flex flex-col">
+                        <h3 class="text-xl md:text-2xl font-black text-center mb-8">買い切り・永久視聴プラン</h3>
+                        
+                        <div class="text-center mb-6 pb-6 border-b border-gray-100">
+                            <p class="text-gray-500 line-through font-bold text-sm mb-1">通常価格: 89,800円(税込)</p>
+                            <p class="text-comic-main font-black text-sm mb-1">早期特典価格</p>
+                            <div class="flex items-baseline justify-center gap-1 mb-3">
+                                <span class="text-4xl md:text-5xl font-black text-comic-dark">69,800</span>
+                                <span class="text-xl font-bold text-comic-dark">円</span>
+                                <span class="text-sm font-bold text-gray-500">(税込)</span>
+                            </div>
+                            <!-- 分割払いの表記追加 -->
+                            <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded px-3 py-2 inline-block">
+                                <p class="text-sm font-bold">クレジットカード6回払いなら</p>
+                                <p class="text-base font-black">月々 11,633円〜</p>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-2">※分割手数料は別途カード会社にて発生いたします。</p>
+                        </div>
+
+                        <!-- 比較リスト -->
+                        <div class="w-fit mx-auto mb-8 flex-grow">
+                            <ul class="space-y-5 font-bold text-gray-700">
+                                <li class="flex items-start text-left">
+                                    <i class="fa-solid fa-check list-icon-check mt-1.5 mr-3 md:mr-4 shrink-0 text-lg"></i>
+                                    <div>
+                                        <span class="text-[13px] text-gray-500 block mb-0.5 font-medium">動画教材の視聴期間</span>
+                                        <span class="text-base md:text-lg"><strong>ずっと視聴可能</strong></span>
+                                    </div>
+                                </li>
+                                <li class="flex items-start text-left">
+                                    <i class="fa-solid fa-check list-icon-check mt-1.5 mr-3 md:mr-4 shrink-0 text-lg"></i>
+                                    <div>
+                                        <span class="text-[13px] text-gray-500 block mb-0.5 font-medium">質問・課題添削</span>
+                                        <span class="text-base md:text-lg">受講開始から<strong>1年間</strong></span>
+                                    </div>
+                                </li>
+                                <li class="flex items-start text-left opacity-50">
+                                    <i class="fa-solid fa-minus list-icon-minus mt-1.5 mr-3 md:mr-4 shrink-0 text-lg"></i>
+                                    <div>
+                                        <span class="text-[13px] text-gray-500 block mb-0.5 font-medium">月1回の追加添削</span>
+                                        <span class="text-base md:text-lg">なし</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- ▼ リンク設定：買い切りプランのURLをhrefに入力してください -->
+                        <a href="https://liberty-palette.lectea.jp/school/course/paid.php?course_id=2535" class="block w-full bg-white border-2 border-comic-dark text-comic-dark font-bold text-lg py-4 px-4 rounded-full text-center mt-auto shadow-[4px_4px_0px_0px_#333333] group-hover:bg-comic-main group-hover:text-white group-hover:border-comic-main group-hover:shadow-[4px_4px_0px_0px_#049466] transition-all">
+                            このプランで申し込む
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 月額プラン -->
+                <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm flex flex-col relative js-anim fade-up transition-all duration-300 md:hover:border-comic-main md:hover:shadow-md group" style="transition-delay: 0.1s;">
+                    <div class="bg-gray-100 border-b border-gray-200 text-gray-700 text-center py-3 rounded-t-xl group-hover:bg-comic-light group-hover:text-comic-main transition-colors duration-300">
+                        <p class="font-bold text-sm">必要な期間だけ学びたい方へ</p>
+                    </div>
+                    
+                    <div class="p-6 md:p-8 flex-grow flex flex-col">
+                        <h3 class="text-xl md:text-2xl font-black text-center mb-8">月額受講プラン</h3>
+                        
+                        <div class="text-center mb-6 pb-6 border-b border-gray-100">
+                            <!-- 高さを合わせるためのダミースペース -->
+                            <p class="text-transparent text-sm mb-1 hidden md:block">スペース</p>
+                            <p class="text-transparent text-sm mb-1 hidden md:block">スペース</p>
+                            
+                            <div class="flex items-baseline justify-center gap-1 mb-3">
+                                <span class="text-lg font-bold text-gray-600">月額</span>
+                                <span class="text-4xl md:text-5xl font-black text-comic-dark">9,800</span>
+                                <span class="text-xl font-bold text-comic-dark">円</span>
+                                <span class="text-sm font-bold text-gray-500">(税込)</span>
+                            </div>
+                            <!-- 自動更新の案内（買い切りプランと高さを合わせるように配置） -->
+                            <div class="bg-gray-50 border border-gray-200 text-gray-700 rounded px-3 py-2 inline-block">
+                                <p class="text-sm font-bold">お申込み日を基準に<br>毎月自動更新されます。</p>
+                            </div>
+                            <p class="text-[10px] text-transparent mt-2 hidden md:block">スペース</p>
+                        </div>
+
+                        <!-- 比較リスト -->
+                        <div class="w-fit mx-auto mb-8 flex-grow">
+                            <ul class="space-y-5 font-bold text-gray-700">
+                                <li class="flex items-start text-left">
+                                    <i class="fa-solid fa-check list-icon-check mt-1.5 mr-3 md:mr-4 shrink-0 text-lg"></i>
+                                    <div>
+                                        <span class="text-[13px] text-gray-500 block mb-0.5 font-medium">動画教材の視聴期間</span>
+                                        <span class="text-base md:text-lg"><strong>加入中のみ</strong>視聴可能</span>
+                                    </div>
+                                </li>
+                                <li class="flex items-start text-left">
+                                    <i class="fa-solid fa-check list-icon-check mt-1.5 mr-3 md:mr-4 shrink-0 text-lg"></i>
+                                    <div>
+                                        <span class="text-[13px] text-gray-500 block mb-0.5 font-medium">質問・課題添削</span>
+                                        <span class="text-base md:text-lg"><strong>加入中のみ</strong></span>
+                                    </div>
+                                </li>
+                                <li class="flex items-start text-left">
+                                    <i class="fa-solid fa-check list-icon-check mt-1.5 mr-3 md:mr-4 shrink-0 text-lg"></i>
+                                    <div>
+                                        <span class="text-[13px] text-gray-500 block mb-0.5 font-medium">月1回の追加添削</span>
+                                        <span class="text-base md:text-lg"><strong>あり</strong></span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mb-4 leading-tight">※月額プランでは、通常の課題とは別に、加入中月1本まで追加添削を受けられます。</p>
+                        
+                        <!-- ▼ リンク設定：月額受講プランのURLをhrefに入力してください -->
+                        <a href="https://liberty-palette.lectea.jp/school/course/paid.php?course_id=3736" class="block w-full bg-white border-2 border-comic-dark text-comic-dark font-bold text-lg py-4 px-4 rounded-full text-center mt-auto shadow-[4px_4px_0px_0px_#333333] group-hover:bg-comic-main group-hover:text-white group-hover:border-comic-main group-hover:shadow-[4px_4px_0px_0px_#049466] transition-all">
+                            このプランで申し込む
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- アドバイス -->
+            <div class="w-fit mx-auto mt-12 bg-blue-50 border border-blue-100 p-6 md:px-8 rounded-lg shadow-sm js-anim fade-up">
+                <div class="flex items-start gap-3">
+                    <div class="shrink-0 pt-1">
+                        <i class="fa-solid fa-lightbulb text-comic-yellow text-xl drop-shadow-sm"></i>
+                    </div>
+                    <p class="text-sm md:text-base font-bold text-gray-700 leading-relaxed text-left">
+                        迷った場合は、まずは<strong>「月額受講プラン」</strong>から始めるのもおすすめです。<br>
+                        必要な期間だけ学べるため、自分に合うかを確かめながら進められます。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. FAQ -->
+    <section class="py-20 bg-white bg-halftone-white relative">
+        <div class="container mx-auto px-4 max-w-3xl">
+            <!-- 装飾付きタイトル -->
+            <div class="mb-12 js-anim pop-in text-center">
+                <h2 class="text-2xl md:text-4xl font-black inline-block text-comic-dark relative">
+                    よくあるご質問
+                    <span class="absolute -bottom-2 left-0 w-full h-1 bg-gray-200 rounded"></span>
+                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1/3 h-1 bg-comic-main rounded"></span>
+                </h2>
+            </div>
+
+            <div class="space-y-4 font-bold">
+                <!-- FAQ 1 -->
+                <div class="faq-item border-2 border-gray-200 bg-white rounded-lg overflow-hidden js-anim fade-up">
+                    <button class="faq-question w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-comic-light transition-colors">
+                        <span class="font-bold text-base md:text-lg flex items-center">
+                            <span class="text-comic-main text-xl mr-3 font-black">Q.</span> 未経験でも大丈夫ですか？
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 faq-icon text-lg"></i>
+                    </button>
+                    <div class="faq-answer px-5 bg-gray-50 text-gray-700 text-sm md:text-base">
+                        <div class="flex items-start pt-4 pb-5 border-t border-gray-200">
+                            <span class="text-gray-400 font-bold text-xl mr-3">A.</span>
+                            <p class="pt-1 font-normal">はい。未経験の方でも、一歩ずつ進められる構成になっているので大丈夫です。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="faq-item border-2 border-gray-200 bg-white rounded-lg overflow-hidden js-anim fade-up">
+                    <button class="faq-question w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-comic-light transition-colors">
+                        <span class="font-bold text-base md:text-lg flex items-center">
+                            <span class="text-comic-main text-xl mr-3 font-black">Q.</span> どんなツールを使いますか？
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 faq-icon text-lg"></i>
+                    </button>
+                    <div class="faq-answer px-5 bg-gray-50 text-gray-700 text-sm md:text-base">
+                        <div class="flex items-start pt-4 pb-5 border-t border-gray-200">
+                            <span class="text-gray-400 font-bold text-xl mr-3">A.</span>
+                            <p class="pt-1 font-normal">Photoshop、Premiere Pro、After Effects を使います。必要に応じて ChatGPT、Midjourney、VOICEVOX なども活用します。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="faq-item border-2 border-gray-200 bg-white rounded-lg overflow-hidden js-anim fade-up">
+                    <button class="faq-question w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-comic-light transition-colors">
+                        <span class="font-bold text-base md:text-lg flex items-center">
+                            <span class="text-comic-main text-xl mr-3 font-black">Q.</span> 本当に一人で作れるようになりますか？
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 faq-icon text-lg"></i>
+                    </button>
+                    <div class="faq-answer px-5 bg-gray-50 text-gray-700 text-sm md:text-base">
+                        <div class="flex items-start pt-4 pb-5 border-t border-gray-200">
+                            <span class="text-gray-400 font-bold text-xl mr-3">A.</span>
+                            <p class="pt-1 font-normal">はい。AIツールの進化によって、これまで分業が前提だった漫画広告動画制作も、一人で進められるようになりました。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="faq-item border-2 border-gray-200 bg-white rounded-lg overflow-hidden js-anim fade-up">
+                    <button class="faq-question w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-comic-light transition-colors">
+                        <span class="font-bold text-base md:text-lg flex items-center">
+                            <span class="text-comic-main text-xl mr-3 font-black">Q.</span> 実践チャレンジとは何ですか？
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 faq-icon text-lg"></i>
+                    </button>
+                    <div class="faq-answer px-5 bg-gray-50 text-gray-700 text-sm md:text-base">
+                        <div class="flex items-start pt-4 pb-5 border-t border-gray-200">
+                            <span class="text-gray-400 font-bold text-xl mr-3">A.</span>
+                            <p class="pt-1 font-normal">案件応募から納品までの流れを想定した実践課題です。チャレンジ後には添削も受けられるため、実案件に入る前に、課題を見つけて見直したうえで本番に臨めます。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="faq-item border-2 border-gray-200 bg-white rounded-lg overflow-hidden js-anim fade-up">
+                    <button class="faq-question w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-comic-light transition-colors">
+                        <span class="font-bold text-base md:text-lg flex items-center">
+                            <span class="text-comic-main text-xl mr-3 font-black">Q.</span> 買い切りプランと月額受講プランの違いは何ですか？
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 faq-icon text-lg"></i>
+                    </button>
+                    <div class="faq-answer px-5 bg-gray-50 text-gray-700 text-sm md:text-base">
+                        <div class="flex items-start pt-4 pb-5 border-t border-gray-200">
+                            <span class="text-gray-400 font-bold text-xl mr-3">A.</span>
+                            <p class="pt-1 font-normal">
+                                コース内容は同じですが、視聴期間・料金が異なります。<br><br>
+                                <strong>買い切り・永久視聴プラン</strong>は、教材をずっと視聴しながら、自分のペースでじっくり学びたい方に向いています。<br>
+                                <strong>月額受講プラン</strong>は、加入中のみ教材を視聴できるプランで、必要な期間だけ学びたい方に向いているのが特徴です。また、月額受講プランでは、加入中は月1作品まで漫画広告動画の追加添削を受けられます。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 6 -->
+                <div class="faq-item border-2 border-gray-200 bg-white rounded-lg overflow-hidden js-anim fade-up">
+                    <button class="faq-question w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-comic-light transition-colors">
+                        <span class="font-bold text-base md:text-lg flex items-center">
+                            <span class="text-comic-main text-xl mr-3 font-black">Q.</span> どれくらいの期間で学べますか？
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 faq-icon text-lg"></i>
+                    </button>
+                    <div class="faq-answer px-5 bg-gray-50 text-gray-700 text-sm md:text-base">
+                        <div class="flex items-start pt-4 pb-5 border-t border-gray-200">
+                            <span class="text-gray-400 font-bold text-xl mr-3">A.</span>
+                            <p class="pt-1 font-normal">学習にかかる期間には個人差があります。動画教材に加えて、ワークや課題にも取り組みながら進める内容のため、必要な期間は人によって異なります。ご自身のペースに合わせて進めていただけます。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 7 -->
+                <div class="faq-item border-2 border-gray-200 bg-white rounded-lg overflow-hidden js-anim fade-up">
+                    <button class="faq-question w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-comic-light transition-colors">
+                        <span class="font-bold text-base md:text-lg flex items-center">
+                            <span class="text-comic-main text-xl mr-3 font-black">Q.</span> 月額受講プランの請求タイミングはいつですか？
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 faq-icon text-lg"></i>
+                    </button>
+                    <div class="faq-answer px-5 bg-gray-50 text-gray-700 text-sm md:text-base">
+                        <div class="flex items-start pt-4 pb-5 border-t border-gray-200">
+                            <span class="text-gray-400 font-bold text-xl mr-3">A.</span>
+                            <p class="pt-1 font-normal">お申込み日を基準に毎月自動更新されます。たとえば4月2日にお申込みの場合、次回以降も毎月2日前後に請求されます。なお、同じ日付が存在しない月は月末に請求されます。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 8 -->
+                <div class="faq-item border-2 border-gray-200 bg-white rounded-lg overflow-hidden js-anim fade-up">
+                    <button class="faq-question w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-comic-light transition-colors">
+                        <span class="font-bold text-base md:text-lg flex items-center">
+                            <span class="text-comic-main text-xl mr-3 font-black">Q.</span> 月額プランを退会する際は手続きが必要ですか？
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 faq-icon text-lg"></i>
+                    </button>
+                    <div class="faq-answer px-5 bg-gray-50 text-gray-700 text-sm md:text-base">
+                        <div class="flex items-start pt-4 pb-5 border-t border-gray-200">
+                            <span class="text-gray-400 font-bold text-xl mr-3">A.</span>
+                            <p class="pt-1 font-normal">はい、退会の際はお手続きが必要です。詳細はお申込み後にご案内いたします。</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. 申込み (クロージング) -->
+    <section class="py-24 bg-comic-light border-t-2 border-gray-200 relative overflow-hidden">
+        <div class="container mx-auto px-4 max-w-4xl text-center relative z-10">
+            <div class="js-anim pop-in">
+                <h2 class="text-2xl md:text-4xl font-black mb-6 text-comic-dark relative inline-block">
+                    さあ、新しいスキルを手に入れよう！
+                </h2>
+            </div>
+            
+            <div class="js-anim fade-up" style="transition-delay: 0.1s;">
+                <p class="text-base md:text-xl font-bold mb-10 text-gray-700 bg-white inline-block px-6 py-3 rounded-lg border border-gray-200 shadow-sm">
+                    AIを活用しながら、漫画広告動画を<br class="md:hidden"><strong class="text-comic-main marker-yellow px-1">一人で作れる力</strong>を身につけたい方へ。
+                </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-center items-stretch gap-4 md:gap-6 js-anim pop-in" style="transition-delay: 0.2s;">
+                <!-- ▼ リンク設定：買い切りプランのURLをhrefに入力してください -->
+                <a href="https://liberty-palette.lectea.jp/school/course/paid.php?course_id=2535" class="w-full sm:w-auto bg-white text-comic-dark font-bold py-3 px-6 md:px-8 rounded-2xl text-center btn-comic flex flex-col justify-center group hover:bg-comic-light hover:!border-comic-main transition-all">
+                    <span class="text-xs text-gray-500 font-bold mb-1 group-hover:text-comic-main transition-colors">自分のペースでじっくり学びたい方へ</span>
+                    <span class="text-base md:text-lg font-black group-hover:text-comic-main transition-colors">買い切りプランで申し込む</span>
+                </a>
+                <!-- ▼ リンク設定：月額受講プランのURLをhrefに入力してください -->
+                <a href="https://liberty-palette.lectea.jp/school/course/paid.php?course_id=3736" class="w-full sm:w-auto bg-white text-comic-dark font-bold py-3 px-6 md:px-8 rounded-2xl text-center btn-comic flex flex-col justify-center group hover:bg-comic-light hover:!border-comic-main transition-all">
+                    <span class="text-xs text-gray-500 font-bold mb-1 group-hover:text-comic-main transition-colors">必要な期間だけ学びたい方へ</span>
+                    <span class="text-base md:text-lg font-black group-hover:text-comic-main transition-colors">月額受講プランで申し込む</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. フッター -->
+    <footer class="bg-comic-dark text-gray-300 py-12 relative">
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <!-- スクールロゴと名前（控えめに再掲） -->
+            <div class="flex flex-col items-center justify-center mb-6 pb-6 border-b border-gray-700">
+                <!-- ロゴ画像枠（後で実際の画像をimgタグで設定してください） -->
+                <div class="w-10 h-10 mb-2 overflow-hidden">
+  <img src="logo.png" alt="ロゴ" class="w-full h-full object-contain">
+</div>
+                <span class="font-bold text-gray-400 text-xs md:text-sm tracking-wide">リバティー・パレット</span>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 text-sm md:text-base">
+                <!-- ▼ リンク設定：各規約のURLをhrefに入力してください -->
+                <a href="https://liberty-palette.lectea.jp/school/course/rule.php">特定商取引法に基づく表記</a>
+                <a href="https://liberty-palette.lectea.jp/school/course/policy.php" class="hover:text-white transition-colors">プライバシーポリシー</a>
+                <a href="https://liberty-palette.lectea.jp/school/course/terms.php" class="hover:text-white transition-colors">利用規約</a>
+            </div>
+            <p class="text-xs md:text-sm text-gray-500">&copy; 2026 リバティー・パレット All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- スクリプト -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // FAQアコーディオン
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                const answer = item.querySelector('.faq-answer');
+                
+                question.addEventListener('click', () => {
+                    const isOpen = item.classList.contains('open');
+                    
+                    faqItems.forEach(otherItem => {
+                        otherItem.classList.remove('open');
+                        otherItem.querySelector('.faq-answer').style.maxHeight = null;
+                    });
+
+                    if (!isOpen) {
+                        item.classList.add('open');
+                        answer.style.maxHeight = answer.scrollHeight + "px";
+                    }
+                });
+            });
+
+            // スクロールアニメーション (Intersection Observer)
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -10% 0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.js-anim').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
